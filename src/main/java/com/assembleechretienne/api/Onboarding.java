@@ -24,11 +24,15 @@ import DAL.MysqlDataAccessHelper;
 import DAL.MysqlParameter;
 import DAL.MysqlParameter.ParameterDirection;
 import Entities.UserCredential;
+import HelperClasses.MailService;
 import HelperClasses.PasswordHash;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
+
+
+/*THe onboarding class handle all registration related event*/
 @Path("onboarding")
 public class Onboarding {
 
@@ -94,6 +98,10 @@ public class Onboarding {
 					user.setUserCredentialParam(username, email, salt, hash));
 
 			if (status.equals("valid")) {
+				String validationUrl="http://www.assembleechretienne.com/validate_email/"+hash+":"+salt;
+				String body="<h1>Bienvenue Dans la communaut&#233 en ligne de l'egise assemblee chretienne. Veillez valider votre email en cliquant sur cette hyperlink <a href="+validationUrl+">"+"clickez!</a><//h1>";
+				
+				MailService.sendEmail(email, "S'il vous plaiz, verifiez votre email", body);
 
 				logger.info("Incoming Request to register: Username " + user.getEmail() + " is successfull");
 				return Response.ok("{\"onboarding\":\"successful\"}").build();
